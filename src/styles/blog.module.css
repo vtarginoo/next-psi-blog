@@ -1,4 +1,23 @@
 .blogIndex {
+  padding: 20px;
+}
+
+.previewAlertContainer {
+  background-color: #fff4e5;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.previewAlert {
+  text-align: center;
+}
+
+.noPosts {
+  text-align: center;
+  color: #999;
+}
+
+/* .blogIndex {
   padding: 0 5%;
 }
 
@@ -248,4 +267,4 @@
   border-radius: 1px;
   width: 100%;
   height: 100%;
-}
+} */

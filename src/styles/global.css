@@ -1,4 +1,18 @@
+/* Importando a fonte diretamente no arquivo global.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+/* Definir fonte global */
 :root {
+  --font-sans: 'Poppins', sans-serif;
+}
+
+body {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* :root {
   --gap-quarter: 0.25rem;
   --gap-half: 0.5rem;
   --gap: 1rem;
@@ -44,7 +58,7 @@ body {
   background-attachment: fixed;
   background-size: 50px 50px;
 
-  /* Hack */
+ 
   overflow-x: hidden;
 }
 
@@ -157,9 +171,9 @@ code[class*='language-css'] {
 .token.directive.tag .tag {
   background: #ff0;
   color: #393a34;
-}
-/* dark */
-pre.dark[class*='language-'] {
+} */
+
+/* pre.dark[class*='language-'] {
   color: #fafbfc;
 }
 .language-json .dark .token.boolean {
@@ -373,4 +387,4 @@ footer span:nth-child(3) {
 
 footer span:nth-child(3) a {
   color: inherit;
-}
+} */

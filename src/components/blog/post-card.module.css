@@ -1,0 +1,35 @@
+.postImage {
+  height: 12.5rem; /* Aproximadamente 200px */
+  object-fit: cover;
+  border-radius: 0.5rem 0.5rem 0 0; /* Bordas arredondadas no topo */
+}
+
+.postCard {
+  border-radius: 0.5rem; /* Bordas arredondadas em todo o card */
+  overflow: hidden; /* Evitar que o conteúdo ultrapasse os limites do card */
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1); /* Sombra leve */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.postCard:hover {
+  transform: translateY(-0.25rem); /* Eleva o card levemente ao hover */
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.2); /* Aumenta a sombra ao hover */
+}
+
+.postMeta {
+  margin-top: 0.5rem; /* Espaçamento superior */
+  font-size: 0.9rem; /* Texto menor para meta informações */
+  color: #555; /* Cor neutra */
+}
+
+.readMore {
+  display: inline-block;
+  margin-top: 0.625rem; /* Espaçamento superior */
+  color: #1890ff; /* Azul padrão */
+  font-size: 0.9rem; /* Texto menor */
+  text-decoration: none; /* Remove sublinhado */
+}
+
+.readMore:hover {
+  text-decoration: underline; /* Adiciona sublinhado ao hover */
+}

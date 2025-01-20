@@ -1,4 +1,4 @@
-import Header from '../components/header'
+import Header from '../components/general/header'
 import ExtLink from '../components/ext-link'
 
 import sharedStyles from '../styles/shared.module.css'
@@ -35,7 +35,6 @@ const contacts = [
 export default function Contact() {
   return (
     <>
-      <Header titlePre="Contact" />
       <div className={sharedStyles.layout}>
         <div className={contactStyles.avatar}>
           <img src="/avatar.png" alt="avatar with letters JJ" height={60} />

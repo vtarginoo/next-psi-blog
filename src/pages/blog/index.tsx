@@ -1,41 +1,45 @@
 import Link from 'next/link'
-import Header from '../../components/header'
 
-import blogStyles from '../../styles/blog.module.css'
-import sharedStyles from '../../styles/shared.module.css'
-
-import {
-  getBlogLink,
-  getDateStr,
-  postIsPublished,
-} from '../../lib/blog-helpers'
-import { textBlock } from '../../lib/notion/renderers'
+import { postIsPublished } from '../../lib/blog-helpers'
 import getNotionUsers from '../../lib/notion/getNotionUsers'
 import getBlogIndex from '../../lib/notion/getBlogIndex'
+import PostCard from '../../components/blog/post-card'
+import { Col, Row } from 'antd'
+import styles from '../../styles/blog.module.css'
 
 export async function getStaticProps({ preview }) {
-  const postsTable = await getBlogIndex()
+  const postsTable = await getBlogIndex() // Função que busca os posts
 
-  const authorsToGet: Set<string> = new Set()
-  const posts: any[] = Object.keys(postsTable)
+  const authorsToGet = new Set<string>() // Definindo o tipo como string para IDs de autores
+  const posts = Object.keys(postsTable)
     .map((slug) => {
       const post = postsTable[slug]
-      // remove draft posts in production
+
+      // Se o post não estiver publicado e o modo preview não estiver ativado, ignore o post
       if (!preview && !postIsPublished(post)) {
         return null
       }
-      post.Authors = post.Authors || []
-      for (const author of post.Authors) {
+
+      // Certificando que o campo Image existe
+      post.Image = post.Image || '/no-image.jpeg' // Caso não tenha imagem, atribui uma imagem padrão
+
+      // Garantir que post.Authors seja um array de strings
+      post.Authors = Array.isArray(post.Authors) ? post.Authors : [] // Se não for um array, define como array vazio
+
+      // Adicionando autores ao Set
+      post.Authors.forEach((author) => {
         authorsToGet.add(author)
-      }
+      })
+
       return post
     })
     .filter(Boolean)
 
+  // Recuperando os dados dos autores
   const { users } = await getNotionUsers([...authorsToGet])
 
   posts.map((post) => {
-    post.Authors = post.Authors.map((id) => users[id].full_name)
+    post.Authors = post.Authors.map((id) => users[id]?.full_name || 'Unknown') // Garantir que se o autor não for encontrado, exibe 'Unknown'
   })
 
   return {
@@ -50,52 +54,29 @@ export async function getStaticProps({ preview }) {
 const Index = ({ posts = [], preview }) => {
   return (
     <>
-      <Header titlePre="Blog" />
       {preview && (
-        <div className={blogStyles.previewAlertContainer}>
-          <div className={blogStyles.previewAlert}>
-            <b>Note:</b>
-            {` `}Viewing in preview mode{' '}
-            <Link href={`/api/clear-preview`} legacyBehavior >
-              <button className={blogStyles.escapePreview}>Exit Preview</button>
+        <div className={styles.previewAlertContainer}>
+          <div className={styles.previewAlert}>
+            <b>Note:</b> Viewing in preview mode{' '}
+            <Link href={`/api/clear-preview`} legacyBehavior>
+              <button className={styles.escapePreview}>Exit Preview</button>
             </Link>
           </div>
         </div>
       )}
-      <div className={`${sharedStyles.layout} ${blogStyles.blogIndex}`}>
-        <h1>My Notion Blog</h1>
-        {posts.length === 0 && (
-          <p className={blogStyles.noPosts}>There are no posts yet</p>
+      <div className={styles.blogIndex}>
+        <h1>Blog do Yuyu</h1>
+        {posts.length === 0 ? (
+          <p className={styles.noPosts}>There are no posts yet</p>
+        ) : (
+          <Row gutter={[16, 16]}>
+            {posts.map((post) => (
+              <Col xs={24} sm={12} md={8} lg={8} key={post.Slug}>
+                <PostCard post={post} />
+              </Col>
+            ))}
+          </Row>
         )}
-        {posts.map((post) => {
-          return (
-            <div className={blogStyles.postPreview} key={post.Slug}>
-              <h3>
-                <span className={blogStyles.titleContainer}>
-                  {!post.Published && (
-                    <span className={blogStyles.draftBadge}>Draft</span>
-                  )}
-                  <Link href="/blog/[slug]" as={getBlogLink(post.Slug)} legacyBehavior>
-                    {post.Page}
-                  </Link>
-                </span>
-              </h3>
-              {post.Authors.length > 0 && (
-                <div className="authors">By: {post.Authors.join(' ')}</div>
-              )}
-              {post.Date && (
-                <div className="posted">Posted: {getDateStr(post.Date)}</div>
-              )}
-              <p>
-                {(!post.preview || post.preview.length === 0) &&
-                  'No preview available'}
-                {(post.preview || []).map((block, idx) =>
-                  textBlock(block, true, `${post.Slug}${idx}`)
-                )}
-              </p>
-            </div>
-          )
-        })}
       </div>
     </>
   )

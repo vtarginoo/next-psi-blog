@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import fetch from 'node-fetch'
 import { useRouter } from 'next/router'
-import Header from '../../components/header'
+import Header from '../../components/general/header'
 import Heading from '../../components/heading'
 import components from '../../components/dynamic'
 import blogStyles from '../../styles/blog.module.css'
@@ -37,7 +37,7 @@ export async function getStaticProps({ params: { slug }, preview }) {
     const { value } = postData.blocks[i]
     const { type, properties } = value
     if (type == 'tweet') {
-      console.log("hi musk")
+      console.log('hi musk')
     }
   }
 
@@ -129,7 +129,7 @@ const RenderPost = ({ post, redirect, preview }) => {
           <div className={blogStyles.previewAlert}>
             <b>Note:</b>
             {` `}Viewing in preview mode{' '}
-            <Link href={`/api/clear-preview?slug=${post.Slug}` } legacyBehavior>
+            <Link href={`/api/clear-preview?slug=${post.Slug}`} legacyBehavior>
               <button className={blogStyles.escapePreview}>Exit Preview</button>
             </Link>
           </div>
@@ -219,40 +219,31 @@ const RenderPost = ({ post, redirect, preview }) => {
               <div className={blogStyles.bookmark}>
                 <div>
                   <div style={{ display: 'flex' }}>
-                
-                      <div
-                        role="button"
-                        className={blogStyles.bookmarkContents}
-                      >
-                        <div className={blogStyles.bookmarkInfo}>
-                          <div className={blogStyles.bookmarkTitle}>
-                            {title}
-                          </div>
-                          <div className={blogStyles.bookmarkDescription}>
-                            {description}
-                          </div>
-                          <div className={blogStyles.bookmarkLinkWrapper}>
-                            <img
-                              src={icon}
-                              className={blogStyles.bookmarkLinkIcon}
-                            />
-                            <div className={blogStyles.bookmarkLink}>
-                              {link}
-                            </div>
-                          </div>
+                    <div role="button" className={blogStyles.bookmarkContents}>
+                      <div className={blogStyles.bookmarkInfo}>
+                        <div className={blogStyles.bookmarkTitle}>{title}</div>
+                        <div className={blogStyles.bookmarkDescription}>
+                          {description}
                         </div>
-                        <div className={blogStyles.bookmarkCoverWrapper1}>
-                          <div className={blogStyles.bookmarkCoverWrapper2}>
-                            <div className={blogStyles.bookmarkCoverWrapper3}>
-                              <img
-                                src={cover}
-                                className={blogStyles.bookmarkCover}
-                              />
-                            </div>
+                        <div className={blogStyles.bookmarkLinkWrapper}>
+                          <img
+                            src={icon}
+                            className={blogStyles.bookmarkLinkIcon}
+                          />
+                          <div className={blogStyles.bookmarkLink}>{link}</div>
+                        </div>
+                      </div>
+                      <div className={blogStyles.bookmarkCoverWrapper1}>
+                        <div className={blogStyles.bookmarkCoverWrapper2}>
+                          <div className={blogStyles.bookmarkCoverWrapper3}>
+                            <img
+                              src={cover}
+                              className={blogStyles.bookmarkCover}
+                            />
                           </div>
                         </div>
                       </div>
-                    
+                    </div>
                   </div>
                 </div>
               </div>
@@ -381,7 +372,7 @@ const RenderPost = ({ post, redirect, preview }) => {
                       key={id}
                       dangerouslySetInnerHTML={{ __html: content }}
                     />
-                  );
+                  )
                 } else {
                   toRender.push(
                     <components.Code key={id} language={language || ''}>

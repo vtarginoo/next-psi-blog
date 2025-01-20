@@ -57,4 +57,16 @@ module.exports = {
     }
     return cfg
   },
+  transpilePackages: [
+    'antd',
+    '@ant-design',
+    'rc-util',
+    'rc-pagination',
+    'rc-picker',
+    'rc-notification',
+    'rc-tooltip',
+  ], // Add this line to transpile specific packages
+  compiler: {
+    styledComponents: true,
+  },
 }
