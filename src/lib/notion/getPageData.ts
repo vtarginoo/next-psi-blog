@@ -1,21 +1,33 @@
 import rpc, { values } from './rpc'
 
+interface PageChunkData {
+  recordMap: {
+    block: Record<string, { value: any }>
+  }
+  cursor: {
+    stack: any[]
+  }
+}
+
 export default async function getPageData(pageId: string) {
-  // a reasonable size limit for the largest blog post (1MB),
-  // as one chunk is about 10KB
-  const maximumChunckNumer = 100
+  const maximumChunkNumber = 100
 
   try {
-    var chunkNumber = 0
-    var data = await loadPageChunk({ pageId, chunkNumber })
-    var blocks = data.recordMap.block
+    let chunkNumber = 0
+    let data: PageChunkData = await loadPageChunk({ pageId, chunkNumber })
+    let blocks = data.recordMap.block
 
-    while (data.cursor.stack.length !== 0 && chunkNumber < maximumChunckNumer) {
+    while (data.cursor.stack.length !== 0 && chunkNumber < maximumChunkNumber) {
       chunkNumber = chunkNumber + 1
-      data = await loadPageChunk({ pageId, chunkNumber, cursor: data.cursor })
-      blocks = Object.assign(blocks, data.recordMap.block)
+      data = await loadPageChunk({
+        pageId,
+        chunkNumber,
+        cursor: data.cursor,
+      })
+      blocks = { ...blocks, ...data.recordMap.block }
     }
-    const blockArray = values(blocks)
+
+    const blockArray = Object.values(blocks)
     if (blockArray[0] && blockArray[0].value.content) {
       // remove table blocks
       blockArray.splice(0, 3)
@@ -33,7 +45,7 @@ export function loadPageChunk({
   cursor = { stack: [] },
   chunkNumber = 0,
   verticalColumns = false,
-}: any) {
+}: any): Promise<PageChunkData> {
   return rpc('loadPageChunk', {
     pageId,
     limit,

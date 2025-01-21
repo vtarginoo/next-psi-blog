@@ -1,14 +1,24 @@
+import { RpcResponse } from '../interface/IRpcResponse'
 import rpc from './rpc'
 
+interface NotionUser {
+  id: string
+  value: {
+    given_name?: string
+    family_name?: string
+  }
+}
+
 export default async function getNotionUsers(ids: string[]) {
-  const { results = [] } = await rpc('getRecordValues', {
+  const response = (await rpc('getRecordValues', {
     requests: ids.map((id: string) => ({
       id,
       table: 'notion_user',
     })),
-  })
+  })) as RpcResponse
 
-  const users: any = {}
+  const results = response.results || []
+  const users: Record<string, { full_name: string }> = {}
 
   for (const result of results) {
     const { value } = result || { value: {} }
@@ -18,7 +28,7 @@ export default async function getNotionUsers(ids: string[]) {
     if (family_name) {
       full_name = `${full_name} ${family_name}`
     }
-    users[value.id] = { full_name }
+    users[result.id] = { full_name }
   }
 
   return { users }

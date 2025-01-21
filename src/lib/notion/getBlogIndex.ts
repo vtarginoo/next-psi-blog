@@ -4,6 +4,7 @@ import getTableData from './getTableData'
 import { getPostPreview } from './getPostPreview'
 import { readFile, writeFile } from '../fs-helpers'
 import { BLOG_INDEX_ID, BLOG_INDEX_CACHE } from './server-constants'
+import { RpcResponse } from '../interface/IRpcResponse'
 
 export default async function getBlogIndex(previews = true) {
   let postsTable: any = null
@@ -20,18 +21,26 @@ export default async function getBlogIndex(previews = true) {
 
   if (!postsTable) {
     try {
-      const data = await rpc('loadPageChunk', {
+      const data = (await rpc('loadPageChunk', {
         pageId: BLOG_INDEX_ID,
-        limit: 100, // TODO: figure out Notion's way of handling pagination
+        limit: 100,
         cursor: { stack: [] },
         chunkNumber: 0,
         verticalColumns: false,
-      })
+      })) as RpcResponse
+
+      if (!data || typeof data !== 'object' || !('recordMap' in data)) {
+        throw new Error('Invalid data format from RPC')
+      }
 
       // Parse table with posts
-      const tableBlock = values(data.recordMap.block).find(
-        (block: any) => block.value.type === 'collection_view'
+      const tableBlock = Object.values(data.recordMap.block).find(
+        (block) => block.value.type === 'collection_view'
       )
+
+      if (!tableBlock) {
+        throw new Error('No collection_view block found in recordMap')
+      }
 
       postsTable = await getTableData(tableBlock, true)
     } catch (err) {
@@ -41,9 +50,8 @@ export default async function getBlogIndex(previews = true) {
       return {}
     }
 
-    // only get 10 most recent post's previews
+    // Process posts previews
     const postsKeys = Object.keys(postsTable).splice(0, 10)
-
     const sema = new Sema(3, { capacity: postsKeys.length })
 
     if (previews) {

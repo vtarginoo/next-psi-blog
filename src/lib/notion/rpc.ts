@@ -1,10 +1,12 @@
 import fetch, { Response } from 'node-fetch'
 import { API_ENDPOINT, NOTION_TOKEN } from './server-constants'
 
-export default async function rpc(fnName: string, body: any) {
+// Adicionando um tipo genérico <T> à função rpc
+export default async function rpc<T>(fnName: string, body: any): Promise<T> {
   if (!NOTION_TOKEN) {
     throw new Error('NOTION_TOKEN is not set in env')
   }
+
   const res = await fetch(`${API_ENDPOINT}/${fnName}`, {
     method: 'POST',
     headers: {
@@ -15,7 +17,7 @@ export default async function rpc(fnName: string, body: any) {
   })
 
   if (res.ok) {
-    return res.json()
+    return res.json() as T // Aqui você faz o cast para o tipo T
   } else {
     throw new Error(await getError(res))
   }
@@ -42,7 +44,7 @@ export function getBodyOrNull(res: Response) {
 export function values(obj: any) {
   const vals: any = []
 
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     vals.push(obj[key])
   })
   return vals

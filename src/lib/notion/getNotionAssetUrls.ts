@@ -31,7 +31,11 @@ export default async function getNotionAsset(
   })
 
   if (assetRes.ok) {
-    return assetRes.json()
+    const jsonResponse = (await assetRes.json()) as { signedUrls: string[] }
+    if (!jsonResponse.signedUrls || !Array.isArray(jsonResponse.signedUrls)) {
+      throw new Error('Invalid response format: missing signedUrls')
+    }
+    return jsonResponse
   } else {
     console.log('bad request', assetRes.status)
     res.json({ status: 'error', message: 'failed to load Notion asset' })

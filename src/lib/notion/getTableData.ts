@@ -2,16 +2,20 @@ import { values } from './rpc'
 import Slugger from 'github-slugger'
 import queryCollection from './queryCollection'
 import { normalizeSlug } from '../blog-helpers'
+import { RecordMap } from '../interface/IRecordMap'
 
 export default async function loadTable(collectionBlock: any, isPosts = false) {
   const slugger = new Slugger()
 
   const { value } = collectionBlock
   let table: any = {}
-  const col = await queryCollection({
+
+  // Tipando a variável `col` como RecordMap
+  const col: RecordMap = await queryCollection({
     collectionId: value.collection_id,
     collectionViewId: value.view_ids[0],
   })
+
   const entries = values(col.recordMap.block).filter((block: any) => {
     return block.value && block.value.parent_id === value.collection_id
   })
@@ -29,11 +33,9 @@ export default async function loadTable(collectionBlock: any, isPosts = false) {
       row.id = entry.value.id
     }
 
-    schemaKeys.forEach(key => {
-      // might be undefined
+    schemaKeys.forEach((key) => {
       let val = props[key] && props[key][0][0]
 
-      // authors and blocks are centralized
       if (val && props[key][0][1]) {
         const type = props[key][0][1][0]
 
@@ -52,19 +54,13 @@ export default async function loadTable(collectionBlock: any, isPosts = false) {
             val = page.value.properties.title[0][0]
             break
           case 'd': // date
-            // start_date: 2019-06-18
-            // start_time: 07:00
-            // time_zone: Europe/Berlin, America/Los_Angeles
-
             if (!type[1].start_date) {
               break
             }
-            // initial with provided date
             const providedDate = new Date(
               type[1].start_date + ' ' + (type[1].start_time || '')
             ).getTime()
 
-            // calculate offset from provided time zone
             const timezoneOffset =
               new Date(
                 new Date().toLocaleString('en-US', {
@@ -72,7 +68,6 @@ export default async function loadTable(collectionBlock: any, isPosts = false) {
                 })
               ).getTime() - new Date().getTime()
 
-            // initialize subtracting time zone offset
             val = new Date(providedDate - timezoneOffset).getTime()
             break
           default:
@@ -87,7 +82,6 @@ export default async function loadTable(collectionBlock: any, isPosts = false) {
       row[schema[key].name] = val || null
     })
 
-    // auto-generate slug from title
     row.Slug = normalizeSlug(row.Slug || slugger.slug(row.Page || ''))
 
     const key = row.Slug
