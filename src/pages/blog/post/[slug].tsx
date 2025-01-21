@@ -1,16 +1,16 @@
 import Link from 'next/link'
 import fetch from 'node-fetch'
 import { useRouter } from 'next/router'
-import Header from '../../components/general/header'
-import Heading from '../../components/heading'
-import components from '../../components/dynamic'
-import blogStyles from '../../styles/blog.module.css'
-import { textBlock } from '../../lib/notion/renderers'
-import getPageData from '../../lib/notion/getPageData'
+import Header from '../../../components/general/header'
+import Heading from '../../../components/heading'
+import components from '../../../components/dynamic'
+import blogStyles from '../../../styles/blog.module.css'
+import { textBlock } from '../../../lib/notion/renderers'
+import getPageData from '../../../lib/notion/getPageData'
 import React, { CSSProperties, useEffect } from 'react'
-import getBlogIndex from '../../lib/notion/getBlogIndex'
-import getNotionUsers from '../../lib/notion/getNotionUsers'
-import { getBlogLink, getDateStr } from '../../lib/blog-helpers'
+import getBlogIndex from '../../../lib/notion/getBlogIndex'
+import getNotionUsers from '../../../lib/notion/getNotionUsers'
+import { getBlogLink, getDateStr } from '../../../lib/blog-helpers'
 
 // Get the data for each blog post
 export async function getStaticProps({ params: { slug }, preview }) {
@@ -21,13 +21,11 @@ export async function getStaticProps({ params: { slug }, preview }) {
   // if we can't find the post or if it is unpublished and
   // viewed without preview mode then we just redirect to /blog
   if (!post || (post.Published !== 'Yes' && !preview)) {
-    console.log(`Failed to find post for slug: ${slug}`)
     return {
-      props: {
-        redirect: '/blog',
-        preview: false,
+      redirect: {
+        destination: '/blog',
+        permanent: false, // Redirecionamento temporário
       },
-      unstable_revalidate: 5,
     }
   }
   const postData = await getPageData(post.id)
@@ -123,7 +121,6 @@ const RenderPost = ({ post, redirect, preview }) => {
 
   return (
     <>
-      <Header titlePre={post.Page} />
       {preview && (
         <div className={blogStyles.previewAlertContainer}>
           <div className={blogStyles.previewAlert}>

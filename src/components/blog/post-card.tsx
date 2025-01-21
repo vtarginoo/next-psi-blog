@@ -5,6 +5,9 @@ import styles from './post-card.module.css'
 const { Meta } = Card
 
 const PostCard = ({ post }) => {
+  // Adicionando o console.log para verificar o valor de post.Slug
+  console.log('Post Slug:', post.Slug) // Verifique se o slug está correto
+
   const postDate = post.Date
     ? new Date(post.Date).toLocaleDateString()
     : 'Unknown date'
@@ -27,7 +30,8 @@ const PostCard = ({ post }) => {
     >
       <Meta
         title={
-          <Link href={`/blog/[slug]`} as={`/blog/${post.Slug}`} legacyBehavior>
+          // Link para a página de post com o slug correto
+          <Link href={`/blog/post/${post.Slug}`} legacyBehavior>
             <a>{post.Page}</a>
           </Link>
         }
@@ -36,11 +40,7 @@ const PostCard = ({ post }) => {
             <p className={styles.postMeta}>
               {postDate} | {authors}
             </p>
-            <Link
-              href={`/blog/[slug]`}
-              as={`/blog/${post.Slug}`}
-              legacyBehavior
-            >
+            <Link href={`/blog/post/${post.Slug}`} legacyBehavior>
               <a className={styles.readMore}>Leia mais</a>
             </Link>
           </>
