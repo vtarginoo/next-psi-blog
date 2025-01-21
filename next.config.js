@@ -69,4 +69,13 @@ module.exports = {
   compiler: {
     styledComponents: true,
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        path: false,
+      }
+    }
+    return config
+  },
 }
