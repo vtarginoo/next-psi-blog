@@ -6,46 +6,23 @@ import getBlogIndex from '../../lib/notion/getBlogIndex'
 import PostCard from '../../components/blog/post-card'
 import styles from '../../styles/blog.module.css'
 import { postIsPublished } from '../../lib/blog-helpers'
+import { fetchPosts } from '../../lib/helpers/fetch-posts'
 
 const POSTS_PER_PAGE = 6 // Número de posts por página
 
 export async function getStaticProps({ preview, params }) {
-  const postsTable = await getBlogIndex()
-
-  const authorsToGet = new Set<string>()
-  const posts = Object.keys(postsTable)
-    .map((slug) => {
-      const post = postsTable[slug]
-
-      if (!preview && !postIsPublished(post)) {
-        return null
-      }
-
-      post.Image = post.Image || '/no-image.jpeg'
-      post.Authors = Array.isArray(post.Authors) ? post.Authors : []
-      post.Authors.forEach((author) => authorsToGet.add(author))
-
-      return post
-    })
-    .filter(Boolean)
-    .sort((a, b) => new Date(b.Date).getTime() - new Date(a.Date).getTime())
-
-  // Recuperando os dados dos autores
-  const { users } = await getNotionUsers([...authorsToGet])
-
-  posts.forEach((post) => {
-    post.Authors = post.Authors.map((id) => users[id]?.full_name || 'Unknown')
-  })
-
   const page = parseInt(params.page, 10) || 1 // Página atual
   const start = (page - 1) * POSTS_PER_PAGE
-  const end = start + POSTS_PER_PAGE
+
+  // Usa o helper para buscar os posts
+  const allPosts = await fetchPosts(0, preview) // `0` para não limitar os posts no helper
+  const posts = allPosts.slice(start, start + POSTS_PER_PAGE)
 
   return {
     props: {
       preview: preview || false,
-      posts: posts.slice(start, end),
-      totalPosts: posts.length,
+      posts,
+      totalPosts: allPosts.length,
       currentPage: page,
     },
     revalidate: 10,
