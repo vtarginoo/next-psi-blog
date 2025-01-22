@@ -2,7 +2,7 @@ import { Sema } from 'async-sema'
 import rpc, { values } from './rpc'
 import getTableData from './getTableData'
 import { getPostPreview } from './getPostPreview'
-import { readFile, writeFile } from '../fs-helpers'
+import { readFile, writeFile } from '../fs-helpers' // Importa as funções que agora chamam a API
 import { BLOG_INDEX_ID, BLOG_INDEX_CACHE } from './server-constants'
 import { RpcResponse } from '../interface/IRpcResponse'
 
@@ -13,7 +13,8 @@ export default async function getBlogIndex(previews = true) {
 
   if (useCache) {
     try {
-      postsTable = JSON.parse(await readFile(cacheFile, 'utf8'))
+      // Usa a função de leitura de arquivo que faz a chamada à API
+      postsTable = JSON.parse(await readFile(cacheFile)) // Remover 'utf8', pois a função já lida com isso internamente
     } catch (_) {
       /* not fatal */
     }
@@ -76,7 +77,8 @@ export default async function getBlogIndex(previews = true) {
     }
 
     if (useCache) {
-      writeFile(cacheFile, JSON.stringify(postsTable), 'utf8').catch(() => {})
+      // Usa a função de escrita de arquivo que faz a chamada à API
+      writeFile(cacheFile, JSON.stringify(postsTable)).catch(() => {})
     }
   }
 

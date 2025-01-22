@@ -1,12 +1,27 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { Spin } from 'antd'
+import styles from '../../styles/blog.module.css'
 
 export default function BlogIndexRedirect() {
   const router = useRouter()
+  const [loading, setLoading] = useState(true) // Estado de carregamento
 
   useEffect(() => {
-    router.replace('/blog/1') // Redireciona para a página 1
+    // Define o estado de loading como true quando começar o redirecionamento
+    setLoading(true)
+
+    // Realiza o redirecionamento para a página 1
+    router.replace('/blog/1').then(() => {
+      // Após o redirecionamento, podemos parar o loading
+      setLoading(false)
+    })
   }, [router])
 
-  return null // Nada será renderizado
+  return (
+    <div className={styles.redirectContainer}>
+      {/* Exibe o spinner enquanto o redirecionamento ocorre */}
+      <Spin spinning={loading} tip="Redirecionando..." />
+    </div>
+  )
 }

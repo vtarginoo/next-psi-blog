@@ -42,20 +42,29 @@ if (!BLOG_INDEX_ID) {
 }
 
 module.exports = {
-  webpack(cfg, { dev, isServer }) {
+  webpack(config, { dev, isServer }) {
     // only compile build-rss in production server build
-    if (dev || !isServer) return cfg
+    if (dev || !isServer) return config
 
     // we're in build mode so enable shared caching for Notion data
     process.env.USE_CACHE = 'true'
 
-    const originalEntry = cfg.entry
-    cfg.entry = async () => {
+    const originalEntry = config.entry
+    config.entry = async () => {
       const entries = { ...(await originalEntry()) }
       entries['build-rss.js'] = './src/lib/build-rss.ts'
       return entries
     }
-    return cfg
+
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        buffer: require.resolve('buffer'), // Adiciona o fallback para o buffer
+        path: false,
+      }
+    }
+
+    return config
   },
   transpilePackages: [
     'antd',
@@ -68,14 +77,5 @@ module.exports = {
   ], // Add this line to transpile specific packages
   compiler: {
     styledComponents: true,
-  },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        path: false,
-      }
-    }
-    return config
   },
 }
