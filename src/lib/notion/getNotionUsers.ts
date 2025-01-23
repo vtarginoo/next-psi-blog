@@ -1,6 +1,3 @@
-import { RpcResponse } from '../interface/IRpcResponse'
-import rpc from './rpc'
-
 interface NotionUser {
   id: string
   value: {
@@ -10,26 +7,13 @@ interface NotionUser {
 }
 
 export default async function getNotionUsers(ids: string[]) {
-  const response = (await rpc('getRecordValues', {
-    requests: ids.map((id: string) => ({
-      id,
-      table: 'notion_user',
-    })),
-  })) as RpcResponse
-
-  const results = response.results || []
+  // Mapeamento dos IDs para os nomes completos, apenas retornando um usuário fixo
   const users: Record<string, { full_name: string }> = {}
 
-  for (const result of results) {
-    const { value } = result || { value: {} }
-    const { given_name, family_name } = value
-    let full_name = given_name || ''
-
-    if (family_name) {
-      full_name = `${full_name} ${family_name}`
-    }
-    users[result.id] = { full_name }
-  }
+  // Definindo Youssef YUnes como o nome fixo para qualquer ID passado
+  ids.forEach((id) => {
+    users[id] = { full_name: 'Youssef Yunes' }
+  })
 
   return { users }
 }

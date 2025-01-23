@@ -42,28 +42,31 @@ if (!BLOG_INDEX_ID) {
 }
 
 module.exports = {
+  env: {
+    NOTION_TOKEN: process.env.NOTION_TOKEN,
+    BLOG_INDEX_ID: process.env.BLOG_INDEX_ID,
+  },
+
   webpack(config, { dev, isServer }) {
-    // only compile build-rss in production server build
-    if (dev || !isServer) return config
+    // // only compile build-rss in production server build
+    // if (dev || !isServer) return config
 
-    // we're in build mode so enable shared caching for Notion data
-    process.env.USE_CACHE = 'true'
+    // // we're in build mode so enable shared caching for Notion data
+    // process.env.USE_CACHE = 'true'
 
-    const originalEntry = config.entry
-    config.entry = async () => {
-      const entries = { ...(await originalEntry()) }
-      entries['build-rss.js'] = './src/lib/build-rss.ts'
-      return entries
-    }
+    // const originalEntry = config.entry
+    // config.entry = async () => {
+    //   const entries = { ...(await originalEntry()) }
+    //   entries['build-rss.js'] = './src/lib/build-rss.ts'
+    //   return entries
+    // }
 
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
-        buffer: require.resolve('buffer'), // Adiciona o fallback para o buffer
-        path: false,
+        buffer: require.resolve('buffer'),
       }
     }
-
     return config
   },
   transpilePackages: [

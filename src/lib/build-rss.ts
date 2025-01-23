@@ -110,4 +110,4 @@ async function main() {
   console.log(`Atom feed file generated at \`${outputPath}\``)
 }
 
-main().catch((error) => console.error(error))
+// main().catch((error) => console.error(error))

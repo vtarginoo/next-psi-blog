@@ -6,7 +6,6 @@ const { Meta } = Card
 
 const PostCard = ({ post }) => {
   // Adicionando o console.log para verificar o valor de post.Slug
-  console.log('Post Slug:', post.Slug) // Verifique se o slug está correto
 
   const postDate = post.Date
     ? new Date(post.Date).toLocaleDateString()

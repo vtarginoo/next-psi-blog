@@ -9,7 +9,7 @@ const { Header: AntHeader } = Layout
 const navItems = [
   { label: 'HOME', page: '/' },
   { label: 'BLOG', page: '/blog' },
-  { label: 'CONTATO', page: '/contact' },
+  //{ label: 'CONTATO', page: '/contact' },
 ]
 
 const ogImageUrl = 'https://notion-blog.now.sh/og-image.png'

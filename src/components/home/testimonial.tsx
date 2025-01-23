@@ -23,26 +23,27 @@ const Testimonial = () => {
 export default Testimonial
 
 const TestimonialContainer = styled.section`
-  padding: 2rem; /* Espaçamento interno */
+  padding: 3rem; /* Espaçamento interno */
   background-color: #f5f5f5;
   display: flex;
   flex-direction: column;
   align-items: center; /* Centraliza horizontalmente */
   justify-content: center; /* Centraliza verticalmente */
   text-align: center; /* Centraliza o texto */
-  gap: 1rem; /* Espaço entre título e parágrafo */
-  height: 25rem;
+  gap: 1.5rem; /* Espaço entre título e parágrafo */
+  height: 30rem;
 
   h2 {
     font-family: 'Poppins', sans-serif; /* Fonte Poppins */
-    font-size: 1.8rem; /* Tamanho do título */
-    color: #2a3c40;
-    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2a3c40; /* Cor do título */
+    margin: 0 20px;
   }
 
   p {
     font-family: 'Poppins', sans-serif; /* Fonte Poppins */
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #555;
     line-height: 1.6;
     max-width: 60%; /* Limita a largura do texto */
@@ -51,13 +52,28 @@ const TestimonialContainer = styled.section`
   }
 
   /* Ajustes para telas menores */
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
+    height: auto;
+    padding: 2rem;
+    h2 {
+      font-size: 1.8rem; /* Reduz o tamanho da fonte em tablets */
+    }
     p {
-      max-width: 90%;
-      height: auto;
-      text-align: left;
-      gap: 2rem;
-      /* Alinha à esquerda em telas menores */
+      max-width: 80%; /* Aumenta a largura do texto em tablets */
+      font-size: 1rem; /* Reduz a fonte para ajustar melhor o texto */
+    }
+  }
+
+  /* Ajustes para celulares */
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    h2 {
+      font-size: 1.5rem; /* Ajusta a fonte do título para celulares */
+    }
+    p {
+      max-width: 90%; /* Aumenta a largura do texto para celulares */
+      font-size: 0.95rem; /* Reduz ainda mais o tamanho da fonte */
+      text-align: left; /* Alinha o texto à esquerda */
     }
   }
 `
