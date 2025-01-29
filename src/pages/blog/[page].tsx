@@ -6,6 +6,7 @@ import styles from '../../styles/blog.module.css'
 import { fetchPosts } from '../../lib/helpers/fetch-posts'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Head from 'next/head'
 
 const POSTS_PER_PAGE = 6
 
@@ -60,6 +61,10 @@ const Index = ({ posts = [], preview, totalPosts, currentPage }) => {
 
   return (
     <>
+      <Head>
+        <title>Youssef Yunes - Blog</title>
+        <link rel="icon" href="/logo-adv.jpeg" />
+      </Head>
       {preview && (
         <div className={styles.previewAlertContainer}>
           <div className={styles.previewAlert}>

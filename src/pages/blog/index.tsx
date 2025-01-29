@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Spin } from 'antd'
 import styles from '../../styles/blog.module.css'
+import Head from 'next/head'
 
 export default function BlogIndexRedirect() {
   const router = useRouter()
@@ -19,9 +20,15 @@ export default function BlogIndexRedirect() {
   }, [router])
 
   return (
-    <div className={styles.redirectContainer}>
-      {/* Exibe o spinner enquanto o redirecionamento ocorre */}
-      <Spin spinning={loading} tip="Redirecionando..." />
-    </div>
+    <>
+      <Head>
+        <title>Redirecionando para o Blog</title>
+        <link rel="icon" href="/logo-adv.jpeg" />
+      </Head>
+      <div className={styles.redirectContainer}>
+        {/* Exibe o spinner enquanto o redirecionamento ocorre */}
+        <Spin spinning={loading} tip="Redirecionando..." />
+      </div>
+    </>
   )
 }

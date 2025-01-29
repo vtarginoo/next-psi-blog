@@ -1,40 +1,47 @@
 import { useRouter } from 'next/router'
-import blogStyles from '../../../styles/blog.module.css'
-import getPageData from '../../../lib/notion/getPageData'
-import React, { useEffect } from 'react'
 import getBlogIndex from '../../../lib/notion/getBlogIndex'
 import getNotionUsers from '../../../lib/notion/getNotionUsers'
-import { getBlogLink, getDateStr } from '../../../lib/blog-helpers'
+import getPageData from '../../../lib/notion/getPageData'
+import { HTMLProps, useEffect } from 'react'
+import styled from 'styled-components'
+import Image from 'next/image'
 
-// Get the data for each blog post
+export async function getStaticPaths() {
+  // Obter todos os slugs de posts do banco de dados ou API
+  const postsTable = await getBlogIndex()
+
+  // Mapear para pegar os slugs
+  const paths = Object.keys(postsTable).map((slug) => ({
+    params: { slug },
+  }))
+
+  return {
+    paths,
+    fallback: true, // true permite fallback para quando um slug não está presente
+  }
+}
+
 export async function getStaticProps({ params: { slug }, preview }) {
-  // load the postsTable so that we can get the page's ID
   const postsTable = await getBlogIndex()
   const post = postsTable[slug]
 
-  // if we can't find the post or if it is unpublished and
-  // viewed without preview mode then we just redirect to /blog
   if (!post || (post.Published !== 'Yes' && !preview)) {
     return {
       redirect: {
         destination: '/blog',
-        permanent: false, // Redirecionamento temporário
+        permanent: false,
       },
     }
   }
+
   const postData = await getPageData(post.id)
   post.content = postData.blocks
 
-  for (let i = 0; i < postData.blocks.length; i++) {
-    const { value } = postData.blocks[i]
-    const { type, properties } = value
-    if (type == 'tweet') {
-      // console.log('hi musk')
-    }
-  }
-
   const { users } = await getNotionUsers(post.Authors || [])
   post.Authors = Object.keys(users).map((id) => users[id].full_name)
+
+  // Aqui, adicione um console.log para verificar os dados
+  console.log(post)
 
   return {
     props: {
@@ -45,79 +52,113 @@ export async function getStaticProps({ params: { slug }, preview }) {
   }
 }
 
-// Return our list of blog posts to prerender
-export async function getStaticPaths() {
-  const postsTable = await getBlogIndex()
-  // we fallback for any unpublished posts to save build time
-  // for actually published ones
-  return {
-    paths: Object.keys(postsTable)
-      .filter((post) => postsTable[post].Published === 'Yes')
-      .map((slug) => getBlogLink(slug)),
-    fallback: true,
-  }
-}
-
-const listTypes = new Set(['bulleted_list', 'numbered_list'])
-
-const RenderPost = ({ post, redirect, preview }) => {
+const RenderPost = ({ post, redirect }) => {
   const router = useRouter()
 
-  let listTagName: string | null = null
-  let listLastId: string | null = null
-  let listMap: {
-    [id: string]: {
-      key: string
-      isNested?: boolean
-      nested: string[]
-      children: React.ReactFragment
-    }
-  } = {}
-
-  useEffect(() => {
-    const twitterSrc = 'https://platform.twitter.com/widgets.js'
-    // make sure to initialize any new widgets loading on
-    // client navigation
-    if (post && post.hasTweet) {
-      if ((window as any)?.twttr?.widgets) {
-        ;(window as any).twttr.widgets.load()
-      } else if (!document.querySelector(`script[src="${twitterSrc}"]`)) {
-        const script = document.createElement('script')
-        script.async = true
-        script.src = twitterSrc
-        document.querySelector('body').appendChild(script)
-      }
-    }
-  }, [])
   useEffect(() => {
     if (redirect && !post) {
       router.replace(redirect)
     }
   }, [redirect, post])
 
-  // If the page is not yet generated, this will be displayed
-  // initially until getStaticProps() finishes running
   if (router.isFallback) {
-    return <div>Loading...</div>
+    return <LoadingText>Loading...</LoadingText>
   }
 
-  // if you don't have a post at this point, and are not
-  // loading one from fallback then  redirect back to the index
   if (!post) {
     return (
-      <div className={blogStyles.post}>
-        <p>
-          Woops! didn't find that post, redirecting you back to the blog index
-        </p>
-      </div>
+      <NotFound>
+        <p>Post não encontrado, redirecionando...</p>
+      </NotFound>
     )
   }
 
   return (
-    <>
-      <h1>SLUG!</h1>
-    </>
+    <Article>
+      {/* Verifique se o título existe e renderize */}
+      {post.Page && <Title>{post.Page}</Title>}
+
+      {/* Verifique se a imagem existe e renderize */}
+      {post.Image && (
+        <Cover>
+          <img
+            src={post.Image}
+            alt={post.Page || 'Post Cover'}
+            width={800}
+            height={400}
+          />
+        </Cover>
+      )}
+
+      <Content>
+        {post.content.map((block, index) => (
+          <Block key={index}>
+            {/* Adicionando formatação ao conteúdo, caso o bloco tenha um título */}
+            {block.value?.properties?.title &&
+              block.value.properties.title[0] && (
+                <BlockTitle>{block.value.properties.title[0][0]}</BlockTitle>
+              )}
+            {/* Adicionando conteúdo do parágrafo */}
+            {block.value?.properties?.body && (
+              <p>{block.value.properties.body[0]}</p>
+            )}
+          </Block>
+        ))}
+      </Content>
+    </Article>
   )
 }
 
+const Article = styled.article`
+  padding: 20px;
+  max-width: 800px;
+  margin: 20px auto;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+`
+
+const Cover = styled.div`
+  margin-bottom: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+`
+
+const Content = styled.div`
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #444;
+`
+
+const Block = styled.div`
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eaeaea;
+`
+
+const BlockTitle = styled.h2`
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+`
+
+const LoadingText = styled.div`
+  text-align: center;
+  font-size: 1.5rem;
+  color: #333;
+`
+
+const NotFound = styled.div`
+  text-align: center;
+  font-size: 1.2rem;
+  color: #d9534f;
+`
 export default RenderPost

@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import Header from '../components/general/header'
-import { Footer } from 'antd/es/layout/layout'
 import Banner from '../components/general/banner'
 import AppFooter from '../components/general/footer'
 
