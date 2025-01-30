@@ -76,7 +76,7 @@ const Index = ({ posts = [], preview, totalPosts, currentPage }) => {
         </div>
       )}
       <div className={styles.blogIndex}>
-        <h1>Blog do Yuyu</h1>
+        <h1>Artigos escritos:</h1>
 
         {/* Exibe o indicador de carregamento enquanto os posts estão sendo carregados */}
         <Spin spinning={loading} tip="Carregando posts...">

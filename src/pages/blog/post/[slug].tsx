@@ -1,10 +1,9 @@
 import { useRouter } from 'next/router'
 import getBlogIndex from '../../../lib/notion/getBlogIndex'
-import getNotionUsers from '../../../lib/notion/getNotionUsers'
 import getPageData from '../../../lib/notion/getPageData'
-import { HTMLProps, useEffect } from 'react'
-import styled from 'styled-components'
-import Image from 'next/image'
+import { useEffect } from 'react'
+import { textBlock } from '../../../lib/notion/renderers'
+import styles from './slug.module.css' // Importando o arquivo CSS
 
 export async function getStaticPaths() {
   // Obter todos os slugs de posts do banco de dados ou API
@@ -35,13 +34,12 @@ export async function getStaticProps({ params: { slug }, preview }) {
   }
 
   const postData = await getPageData(post.id)
+  post.Authors = 'Youssef Yunes'
   post.content = postData.blocks
-
-  const { users } = await getNotionUsers(post.Authors || [])
-  post.Authors = Object.keys(users).map((id) => users[id].full_name)
+  console.log(post.content)
 
   // Aqui, adicione um console.log para verificar os dados
-  console.log(post)
+  //console.log(post)
 
   return {
     props: {
@@ -62,103 +60,122 @@ const RenderPost = ({ post, redirect }) => {
   }, [redirect, post])
 
   if (router.isFallback) {
-    return <LoadingText>Loading...</LoadingText>
+    return <div className={styles.textBlock}>Loading...</div>
   }
 
   if (!post) {
     return (
-      <NotFound>
+      <div className={styles.textBlock}>
         <p>Post não encontrado, redirecionando...</p>
-      </NotFound>
+      </div>
     )
   }
 
+  const postDate = post.Date
+    ? new Date(post.Date).toLocaleDateString()
+    : 'Data desconhecida'
+  const authors = post.Authors || 'Autor desconhecido'
+
   return (
-    <Article>
-      {/* Verifique se o título existe e renderize */}
-      {post.Page && <Title>{post.Page}</Title>}
+    <>
+      <div className={styles.textBlock}>
+        <h1 className={styles.header}>{post.Page || ''}</h1>
+        {authors && <div className={styles.textBlock}>By: {authors}</div>}
+        {postDate && <div className={styles.textBlock}>Posted: {postDate}</div>}
+        <hr />
 
-      {/* Verifique se a imagem existe e renderize */}
-      {post.Image && (
-        <Cover>
-          <img
-            src={post.Image}
-            alt={post.Page || 'Post Cover'}
-            width={800}
-            height={400}
-          />
-        </Cover>
-      )}
+        {(!post.content || post.content.length === 0) && (
+          <p>This post has no content</p>
+        )}
 
-      <Content>
-        {post.content.map((block, index) => (
-          <Block key={index}>
-            {/* Adicionando formatação ao conteúdo, caso o bloco tenha um título */}
-            {block.value?.properties?.title &&
-              block.value.properties.title[0] && (
-                <BlockTitle>{block.value.properties.title[0][0]}</BlockTitle>
-              )}
-            {/* Adicionando conteúdo do parágrafo */}
-            {block.value?.properties?.body && (
-              <p>{block.value.properties.body[0]}</p>
-            )}
-          </Block>
-        ))}
-      </Content>
-    </Article>
+        {(post.content || []).map((block, blockIdx) => {
+          const { value } = block
+          const { type, properties, id } = value
+
+          let toRender = []
+
+          switch (type) {
+            case 'text':
+              if (properties) {
+                toRender.push(
+                  <div className={styles.textBlock} key={id}>
+                    {properties.title}
+                  </div>
+                )
+              }
+              break
+            case 'image':
+            case 'video':
+            case 'embed': {
+              const { display_source } = value.format || {}
+              toRender.push(
+                <div className={styles.mediaWrapper} key={id}>
+                  {type === 'image' ? (
+                    <img src={display_source} alt="Post Image" />
+                  ) : (
+                    <video src={display_source} controls />
+                  )}
+                </div>
+              )
+              break
+            }
+            case 'quote':
+              const quoteTitle = properties?.title || 'Default quote text'
+              toRender.push(
+                <div className={styles.quoteBlock} key={id}>
+                  {quoteTitle}
+                </div>
+              )
+              break
+            case 'header':
+              const headerTitle = properties?.title || 'Default header'
+              toRender.push(
+                <h1 className={styles.header} key={id}>
+                  {headerTitle}
+                </h1>
+              )
+              break
+            case 'sub_header':
+              const subHeaderTitle = properties?.title || 'Default sub-header'
+              toRender.push(
+                <h2 className={styles.subHeader} key={id}>
+                  {subHeaderTitle}
+                </h2>
+              )
+              break
+            case 'bookmark': {
+              const { link, title, description } = properties
+              const { bookmark_cover } = value.format || {}
+              toRender.push(
+                <div className={styles.bookmark} key={id}>
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.bookmarkLink}
+                  >
+                    <h4>{title}</h4>
+                    <p>{description}</p>
+                    <img
+                      src={bookmark_cover}
+                      alt={title}
+                      className={styles.bookmarkImage}
+                    />
+                  </a>
+                </div>
+              )
+              break
+            }
+            default:
+              console.log('Unknown block type', type)
+              break
+          }
+
+          return toRender
+        })}
+      </div>
+    </>
   )
 }
 
-const Article = styled.article`
-  padding: 20px;
-  max-width: 800px;
-  margin: 20px auto;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-`
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-`
-
-const Cover = styled.div`
-  margin-bottom: 30px;
-  border-radius: 8px;
-  overflow: hidden;
-`
-
-const Content = styled.div`
-  font-size: 1.2rem;
-  line-height: 1.6;
-  color: #444;
-`
-
-const Block = styled.div`
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eaeaea;
-`
-
-const BlockTitle = styled.h2`
-  font-size: 2rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 10px;
-`
-
-const LoadingText = styled.div`
-  text-align: center;
-  font-size: 1.5rem;
-  color: #333;
-`
-
-const NotFound = styled.div`
-  text-align: center;
-  font-size: 1.2rem;
-  color: #d9534f;
-`
 export default RenderPost

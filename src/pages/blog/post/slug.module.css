@@ -1,0 +1,108 @@
+.textBlock {
+  max-width: 800px; /* Limitar a largura para melhorar a legibilidade */
+  margin: 0 auto; /* Centralizar o conteúdo */
+  padding: 0 20px; /* Adicionar algum espaçamento nas laterais */
+  line-height: 1.6; /* Melhorar o espaçamento entre as linhas */
+  text-align: left; /* Garantir que o texto comece alinhado à esquerda */
+}
+
+/* Estilo para o título */
+.slug_header {
+  font-size: 2.5rem; /* Aumentar o tamanho do título */
+  text-align: left; /* Centralizar o título */
+  margin-bottom: 0.8rem; /* Ajustar a margem inferior */
+  color: #333; /* Cor do título */
+  font-weight: bold; /* Aumentar o peso da fonte para dar mais destaque */
+}
+
+/* Estilo para o texto de autor e data */
+.textBlock div {
+  font-size: 1rem;
+  text-align: left; /* Alinhar texto do autor e data à esquerda */
+  margin-bottom: 0.2rem;
+  color: #777; /* Cor mais suave para o texto secundário */
+}
+
+/* Estilo para o separador (linha horizontal) com uma classe local */
+.hrSeparator {
+  margin: 30px 0;
+  border: 0;
+  border-top: 1px solid #ddd;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  /* Ajustar o tamanho do título em telas menores */
+  .header {
+    font-size: 2rem;
+  }
+
+  /* Ajustar o tamanho do texto em telas menores */
+  .textBlock div {
+    font-size: 0.9rem;
+  }
+
+  /* Ajustar a largura do bloco de texto em telas pequenas */
+  .textBlock {
+    max-width: 100%;
+    padding: 0 10px; /* Menos padding em telas pequenas */
+  }
+
+  /* Ajuste da linha horizontal */
+  .hrSeparator {
+    margin: 20px 0;
+  }
+}
+
+/* Estilo para as imagens e vídeos */
+.mediaWrapper {
+  position: relative;
+  width: 100%;
+  height: auto;
+  padding-top: 56.25%; /* Aspect Ratio 16:9 */
+}
+
+.mediaWrapper img,
+.mediaWrapper video {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+/* Estilo para as citações */
+.quoteBlock {
+  font-style: italic;
+  border-left: 3px solid #ddd;
+  padding-left: 20px;
+  margin: 20px 0;
+  color: #555;
+}
+
+/* Estilo para os cabeçalhos */
+.subHeader {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  text-align: left; /* Centralizar o subtítulo */
+}
+
+/* Estilo para os links de bookmark */
+.bookmark {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  flex-wrap: wrap; /* Melhorar o layout em telas menores */
+}
+
+.bookmarkLink {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  text-align: center;
+}
+
+.bookmarkImage {
+  width: 80px;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 10px;
+}
