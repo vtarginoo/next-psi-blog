@@ -9,7 +9,9 @@
 }
 
 body {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Poppins', sans-serif;
+  color: #222; /* Texto mais escuro para melhor legibilidade */
+  background-color: #f9f9f9; /* Fundo levemente acinzentado */
 }
 
 /* :root {

@@ -1,22 +1,20 @@
+import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import styles from '../../../styles/slug.module.css' // Supondo que você tenha um arquivo de estilos
 import getBlogIndex from '../../../lib/notion/getBlogIndex'
 import getPageData from '../../../lib/notion/getPageData'
-import { useEffect } from 'react'
-import { textBlock } from '../../../lib/notion/renderers'
-import styles from './slug.module.css' // Importando o arquivo CSS
+import { renderBlock } from '../../../lib/helpers/renderBlock'
 
 export async function getStaticPaths() {
-  // Obter todos os slugs de posts do banco de dados ou API
   const postsTable = await getBlogIndex()
 
-  // Mapear para pegar os slugs
   const paths = Object.keys(postsTable).map((slug) => ({
     params: { slug },
   }))
 
   return {
     paths,
-    fallback: true, // true permite fallback para quando um slug não está presente
+    fallback: true,
   }
 }
 
@@ -36,10 +34,6 @@ export async function getStaticProps({ params: { slug }, preview }) {
   const postData = await getPageData(post.id)
   post.Authors = 'Youssef Yunes'
   post.content = postData.blocks
-  console.log(post.content)
-
-  // Aqui, adicione um console.log para verificar os dados
-  //console.log(post)
 
   return {
     props: {
@@ -84,94 +78,25 @@ const RenderPost = ({ post, redirect }) => {
         {postDate && <div className={styles.textBlock}>Posted: {postDate}</div>}
         <hr />
 
+        {/* Imagem de capa do post */}
+        {post.Image && (
+          <div className={styles.imageContainer}>
+            <img
+              src={post.Image}
+              alt={post.Page}
+              className={styles.coverImage}
+            />
+          </div>
+        )}
+
         {(!post.content || post.content.length === 0) && (
           <p>This post has no content</p>
         )}
 
-        {(post.content || []).map((block, blockIdx) => {
+        {post.content?.map((block, blockIdx) => {
           const { value } = block
           const { type, properties, id } = value
-
-          let toRender = []
-
-          switch (type) {
-            case 'text':
-              if (properties) {
-                toRender.push(
-                  <div className={styles.textBlock} key={id}>
-                    {properties.title}
-                  </div>
-                )
-              }
-              break
-            case 'image':
-            case 'video':
-            case 'embed': {
-              const { display_source } = value.format || {}
-              toRender.push(
-                <div className={styles.mediaWrapper} key={id}>
-                  {type === 'image' ? (
-                    <img src={display_source} alt="Post Image" />
-                  ) : (
-                    <video src={display_source} controls />
-                  )}
-                </div>
-              )
-              break
-            }
-            case 'quote':
-              const quoteTitle = properties?.title || 'Default quote text'
-              toRender.push(
-                <div className={styles.quoteBlock} key={id}>
-                  {quoteTitle}
-                </div>
-              )
-              break
-            case 'header':
-              const headerTitle = properties?.title || 'Default header'
-              toRender.push(
-                <h1 className={styles.header} key={id}>
-                  {headerTitle}
-                </h1>
-              )
-              break
-            case 'sub_header':
-              const subHeaderTitle = properties?.title || 'Default sub-header'
-              toRender.push(
-                <h2 className={styles.subHeader} key={id}>
-                  {subHeaderTitle}
-                </h2>
-              )
-              break
-            case 'bookmark': {
-              const { link, title, description } = properties
-              const { bookmark_cover } = value.format || {}
-              toRender.push(
-                <div className={styles.bookmark} key={id}>
-                  <a
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.bookmarkLink}
-                  >
-                    <h4>{title}</h4>
-                    <p>{description}</p>
-                    <img
-                      src={bookmark_cover}
-                      alt={title}
-                      className={styles.bookmarkImage}
-                    />
-                  </a>
-                </div>
-              )
-              break
-            }
-            default:
-              console.log('Unknown block type', type)
-              break
-          }
-
-          return toRender
+          return renderBlock(type, properties, value, id)
         })}
       </div>
     </>
