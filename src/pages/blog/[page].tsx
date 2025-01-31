@@ -48,16 +48,32 @@ export async function getStaticPaths() {
 }
 
 const Index = ({ posts = [], preview, totalPosts, currentPage }) => {
-  const [loading, setLoading] = useState(true) // Controle de loading
+  const [loading, setLoading] = useState(false) // Controle de loading
   const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE)
   const router = useRouter()
 
+  // Definindo o estado de loading quando o router mudar de página
   useEffect(() => {
-    // Define o estado de loading como false após os posts serem carregados
-    if (posts.length > 0) {
+    const handleRouteChange = () => {
+      setLoading(true)
+    }
+
+    const handleRouteComplete = () => {
       setLoading(false)
     }
-  }, [posts])
+
+    // Registrando eventos de navegação
+    router.events.on('routeChangeStart', handleRouteChange)
+    router.events.on('routeChangeComplete', handleRouteComplete)
+    router.events.on('routeChangeError', handleRouteComplete)
+
+    // Limpando eventos ao desmontar o componente
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange)
+      router.events.off('routeChangeComplete', handleRouteComplete)
+      router.events.off('routeChangeError', handleRouteComplete)
+    }
+  }, [router])
 
   return (
     <>
@@ -65,6 +81,7 @@ const Index = ({ posts = [], preview, totalPosts, currentPage }) => {
         <title>Youssef Yunes - Blog</title>
         <link rel="icon" href="/logo-adv.jpeg" />
       </Head>
+
       {preview && (
         <div className={styles.previewAlertContainer}>
           <div className={styles.previewAlert}>
@@ -75,46 +92,53 @@ const Index = ({ posts = [], preview, totalPosts, currentPage }) => {
           </div>
         </div>
       )}
+
       <div className={styles.blogIndex}>
         <h1>Artigos escritos:</h1>
 
         {/* Exibe o indicador de carregamento enquanto os posts estão sendo carregados */}
-        <Spin spinning={loading} tip="Carregando posts...">
-          <div className={styles.blogIndexContent}>
-            {posts.length === 0 ? (
-              <p className={styles.noPosts}>Não há posts ainda</p>
-            ) : (
-              <>
-                <Row gutter={[16, 16]}>
-                  {posts.map((post) => (
-                    <Col xs={24} sm={12} md={8} lg={8} key={post.Slug}>
-                      <PostCard post={post} />
-                    </Col>
-                  ))}
-                </Row>
-                <div className={styles.pagination}>
-                  {currentPage > 1 && (
-                    <button
-                      onClick={() => router.push(`/blog/${currentPage - 1}`)}
-                    >
-                      Anterior
-                    </button>
-                  )}
-                  <span>
-                    Página {currentPage} de {totalPages}
-                  </span>
-                  {currentPage < totalPages && (
-                    <button
-                      onClick={() => router.push(`/blog/${currentPage + 1}`)}
-                    >
-                      Próxima
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
+        {loading && (
+          <div className={styles.redirectContainer}>
+            <Spin spinning={loading} tip="Carregando posts...">
+              <div className={styles.blogIndexContent}></div>
+            </Spin>
           </div>
-        </Spin>
+        )}
+
+        <div className={styles.blogIndexContent}>
+          {posts.length === 0 ? (
+            <p className={styles.noPosts}>Não há posts ainda</p>
+          ) : (
+            <>
+              <Row gutter={[16, 16]}>
+                {posts.map((post) => (
+                  <Col xs={24} sm={12} md={8} lg={8} key={post.Slug}>
+                    <PostCard post={post} />
+                  </Col>
+                ))}
+              </Row>
+              <div className={styles.pagination}>
+                {currentPage > 1 && (
+                  <button
+                    onClick={() => router.push(`/blog/${currentPage - 1}`)}
+                  >
+                    Anterior
+                  </button>
+                )}
+                <span>
+                  Página {currentPage} de {totalPages}
+                </span>
+                {currentPage < totalPages && (
+                  <button
+                    onClick={() => router.push(`/blog/${currentPage + 1}`)}
+                  >
+                    Próxima
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </>
   )

@@ -133,6 +133,33 @@
 }
 
 /* ------------------------- */
+/* Spin Styles */
+/* ------------------------- */
+
+/* Novo Estilo para o Carregamento */
+.redirectContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed; /* Fixa o carregamento no centro da tela */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
+  z-index: 9999; /* Garante que o carregamento fique acima de outros conteúdos */
+}
+
+.ant-spin {
+  font-size: 3rem; /* Tamanho maior do spinner */
+  color: white; /* Cor do texto para o loading */
+}
+
+.ant-spin-dot {
+  font-size: 5rem; /* Tamanho maior da animação de carregamento */
+}
+
+/* ------------------------- */
 /* Responsive Styles */
 /* ------------------------- */
 

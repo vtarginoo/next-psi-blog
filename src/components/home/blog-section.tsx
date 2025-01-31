@@ -3,7 +3,34 @@ import styled from 'styled-components'
 import PostCard from '../blog/post-card'
 import React from 'react'
 
-const BlogSection = ({ posts = [], loading }) => {
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+
+const BlogSection = ({ posts = [] }) => {
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  // Lógica de controle de carregamento durante a navegação
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setLoading(true)
+    }
+
+    const handleRouteComplete = () => {
+      setLoading(false)
+    }
+
+    router.events.on('routeChangeStart', handleRouteChange)
+    router.events.on('routeChangeComplete', handleRouteComplete)
+    router.events.on('routeChangeError', handleRouteComplete)
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange)
+      router.events.off('routeChangeComplete', handleRouteComplete)
+      router.events.off('routeChangeError', handleRouteComplete)
+    }
+  }, [router])
+
   return (
     <BlogSectionWrapper>
       <SectionHeader>
@@ -15,32 +42,32 @@ const BlogSection = ({ posts = [], loading }) => {
       </SectionHeader>
 
       {loading ? (
-        <LoadingContainer>
+        <RedirectContainer>
           <Spin size="large" />
-        </LoadingContainer>
+        </RedirectContainer>
       ) : posts.length > 0 ? (
         <StyledCarouselWrapper>
           <StyledCarousel
             autoplay
-            dots={true} // Mostra pontos de navegação em telas pequenas
-            slidesToShow={3} // Mostra 3 cards em telas grandes
-            slidesToScroll={1} // Avança 1 card por vez
+            dots={true}
+            slidesToShow={3}
+            slidesToScroll={1}
             infinite
-            arrows={true} // Mostra as setas de navegação
+            arrows={true}
             responsive={[
               {
-                breakpoint: 1024, // Para tablets
+                breakpoint: 1024,
                 settings: {
-                  slidesToShow: 2, // Mostra 2 slides
-                  arrows: true, // Mantém as setas
+                  slidesToShow: 2,
+                  arrows: true,
                 },
               },
               {
-                breakpoint: 768, // Para celulares
+                breakpoint: 768,
                 settings: {
-                  slidesToShow: 1, // Mostra 1 slide
-                  arrows: false, // Remove as setas
-                  dots: true, // Mostra os pontos
+                  slidesToShow: 1,
+                  arrows: false,
+                  dots: true,
                 },
               },
             ]}
@@ -95,7 +122,7 @@ const SectionHeader = styled.div`
     margin: 0 20px;
 
     @media (max-width: 768px) {
-      font-size: 1.5rem; /* Reduz a fonte em celulares */
+      font-size: 1.5rem;
     }
   }
 `
@@ -109,7 +136,7 @@ const StyledCarouselWrapper = styled.div`
   position: relative;
 
   @media (max-width: 768px) {
-    width: 100%; /* Ocupar toda a largura em celulares */
+    width: 100%;
   }
 `
 
@@ -121,7 +148,7 @@ const StyledCarousel = styled(Carousel)`
     z-index: 10;
 
     @media (max-width: 768px) {
-      font-size: 20px; /* Ajusta o tamanho das setas */
+      font-size: 20px;
     }
   }
 
@@ -131,15 +158,8 @@ const StyledCarousel = styled(Carousel)`
   }
 
   .slick-dots li button {
-    background-color: #999; /* Cor dos pontos */
+    background-color: #999;
   }
-`
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
 `
 
 const NoPosts = styled.div`
@@ -148,7 +168,30 @@ const NoPosts = styled.div`
   margin-top: 20px;
 
   @media (max-width: 768px) {
-    font-size: 1rem; /* Ajusta a fonte em telas menores */
+    font-size: 1rem;
     text-align: center;
+  }
+`
+
+// Novo estilo para o carregamento com o RedirectContainer
+const RedirectContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
+  z-index: 9999; /* Garante que o carregamento fique acima de outros conteúdos */
+`
+
+const StyledSpin = styled(Spin)`
+  font-size: 3rem;
+  color: white;
+
+  .ant-spin-dot {
+    font-size: 5rem; /* Tamanho maior da animação de carregamento */
   }
 `
