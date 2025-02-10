@@ -31,8 +31,8 @@ export default function Index({ latestPosts }) {
   return (
     <>
       <Head>
-        <title>Youssef Yunes - Home</title>
-        <link rel="icon" href="/logo-adv.jpeg" />
+        <title>Aline Monteiro - Home</title>
+        <link rel="icon" href="/logo-psi.png" />
       </Head>
 
       {loading ? (

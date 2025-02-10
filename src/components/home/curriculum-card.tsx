@@ -19,7 +19,7 @@ const CurriculumCard = () => {
         </ul>
       </ContentContainer>
       <ImageContainer>
-        <img src="/curriculum-card.png" alt="Curriculum" />
+        <img src="/psi-curriculum.png" alt="Curriculum" />
       </ImageContainer>
     </CardSection>
   )
@@ -32,7 +32,7 @@ const CardSection = styled.section`
   display: flex;
   flex-direction: row;
   gap: 1.5rem;
-  background-color: #465558;
+  background-color: #4b6464;
   color: #ffffff;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   width: 100%;
@@ -51,7 +51,7 @@ const CardSection = styled.section`
 
 const ImageContainer = styled.div`
   flex: 50%; /* Mais espaço para a imagem */
-  background-color: #465558;
+  background-color: #4b6464;
   display: flex;
   align-items: center;
   justify-content: center;

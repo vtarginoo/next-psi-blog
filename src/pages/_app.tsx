@@ -8,8 +8,8 @@ export default function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>Youssef Yunes</title>
-        <link rel="icon" href="/logo-adv.jpeg" />
+        <title>Aline Monteiro</title>
+        <link rel="icon" href="/logo-psi.png" />
       </Head>
       <Layout>
         <Component {...pageProps} />

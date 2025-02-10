@@ -7,7 +7,7 @@ export default function AppFooter() {
   return (
     <StyledFooter className="footer-adv">
       <p>
-        © {new Date().getFullYear()} Youssef Yunes. Todos os direitos
+        © {new Date().getFullYear()} Aline Monteiro. Todos os direitos
         reservados.
       </p>
     </StyledFooter>

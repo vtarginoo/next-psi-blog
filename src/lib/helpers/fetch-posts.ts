@@ -1,10 +1,8 @@
 import getBlogIndex from '../notion/getBlogIndex'
-import getNotionUsers from '../notion/getNotionUsers'
 
 export const fetchPosts = async (start = 0, limit = 0, preview = false) => {
   try {
     const postsTable = await getBlogIndex()
-    const authorsToGet = new Set<string>()
 
     let posts = Object.keys(postsTable)
       .map((slug) => {
@@ -15,7 +13,8 @@ export const fetchPosts = async (start = 0, limit = 0, preview = false) => {
 
         post.Image = post.Image || '/no-image.jpeg'
         post.Authors = Array.isArray(post.Author) ? post.Author : []
-        post.Authors.forEach((author) => authorsToGet.add(author))
+        // Aqui, simplesmente substituímos os autores pela string "Aline Monteiro"
+        post.Authors = post.Authors.length ? ['Aline Monteiro'] : []
 
         return post
       })
@@ -26,11 +25,7 @@ export const fetchPosts = async (start = 0, limit = 0, preview = false) => {
     )
     posts = posts.slice(start, start + limit)
 
-    const { users } = await getNotionUsers([...authorsToGet])
-
-    posts.forEach((post) => {
-      post.Authors = post.Authors.map((id) => users[id]?.full_name || 'Unknown')
-    })
+    //const { users } = await getNotionUsers([...authorsToGet])
 
     return posts
   } catch (error) {

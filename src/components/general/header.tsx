@@ -8,8 +8,8 @@ const { Header: AntHeader } = Layout
 
 const navItems = [
   { label: 'HOME', page: '/' },
+  { label: 'CONTACT', page: '/contact' },
   { label: 'BLOG', page: '/blog' },
-  //{ label: 'CONTATO', page: '/contact' },
 ]
 
 const ogImageUrl = 'https://notion-blog.now.sh/og-image.png'
@@ -33,7 +33,7 @@ const Header = ({ titlePre = '' }: { titlePre?: string }) => {
       </Head>
 
       <LogoContainer>
-        <LogoImage src="/logo-adv.jpeg" alt="Logo" />
+        <LogoImage src="/logo-psi.png" alt="Logo" />
       </LogoContainer>
 
       <StyledMenu
@@ -67,7 +67,7 @@ const LogoContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #2a3c40; /* Cor de fundo para a logo */
+  background-color: ##ffffff; /* Cor de fundo para a logo */
   padding: 0 20px; /* Removido o padding vertical, mantendo o horizontal */
   border-radius: 4px; /* Mais reto, sem bordas arredondadas */
   margin-right: 20px; /* Espaço entre a logo e os itens de navegação */
