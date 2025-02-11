@@ -66,7 +66,9 @@ export default function Contact() {
           </LocationText>
         </LocationContainer>
 
-        <ConsultorioButton>Conheça o Consultório</ConsultorioButton>
+        <ConsultorioButton href="/consultorio">
+          Conheça o Consultório
+        </ConsultorioButton>
       </Card>
     </Container>
   )

@@ -8,7 +8,8 @@ const { Header: AntHeader } = Layout
 
 const navItems = [
   { label: 'HOME', page: '/' },
-  { label: 'CONTACT', page: '/contact' },
+  { label: 'CONTATO', page: '/contact' },
+  { label: 'CONSULTORIO', page: '/consultorio' },
   { label: 'BLOG', page: '/blog' },
 ]
 
