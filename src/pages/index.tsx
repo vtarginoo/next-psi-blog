@@ -6,6 +6,8 @@ import { fetchPosts } from '../lib/helpers/fetch-posts'
 import Head from 'next/head'
 import { Spin } from 'antd'
 import styled from 'styled-components'
+import Contact from './contact'
+import ContactSection from '../components/home/contact-section'
 
 export async function getStaticProps() {
   const posts = await fetchPosts(0, 4)
@@ -44,6 +46,7 @@ export default function Index({ latestPosts }) {
           <Testimonial />
           <CurriculumCard />
           <BlogSection posts={latestPosts} />
+          <ContactSection></ContactSection>
         </>
       )}
     </>
