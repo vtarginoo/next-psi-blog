@@ -19,10 +19,14 @@ const StyledLayout = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  max-width: 100%; /* Garante que o layout não ultrapasse a tela */
+  overflow-x: hidden; /* Impede o overflow horizontal */
 `
 
 const Content = styled.main`
-  padding: 0px; /* Pode ajustar conforme necessário */
+  padding: 0; /* Ajuste conforme necessário */
   background-color: #f5f5f5;
   flex-grow: 1; /* Para garantir que o conteúdo ocupe o espaço restante */
+  width: 100%; /* Garante que o conteúdo ocupe toda a largura disponível */
+  box-sizing: border-box; /* Evita que padding extra cause overflow */
 `
